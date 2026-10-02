@@ -1,17 +1,19 @@
 # Notch Glass
 
-A theme plugin for [Brick-Bread/WNotch](https://github.com/Brick-Bread/WNotch), built against its supported **plugin API 6**. Version 0.1.0 offers two looks:
+A theme plugin for [Brick-Bread/WNotch](https://github.com/Brick-Bread/WNotch), built against its supported **plugin API 6**. Version 0.1.1 offers two looks:
 
 - **Glass / Smoked:** translucent charcoal, silver edges, mint highlights.
 - **Glass / Frosted:** translucent white, graphite text, teal highlights.
 
 The themes cover the compact pill, expanded shell, cards, shared buttons, tab strip, text inputs, fonts, radii, progress tracks and terminal palette. Shared resources also colour the shelf and plugin pages. The existing layout, interactions and activity glows remain controlled by Notch.
 
+Built-in and plugin-managed tabs share the same font, spacing, height and selected appearance, including tabs added after startup. A small WPF compatibility adapter replaces the fixed style references WNotch currently gives plugin tabs with live resource references. It also aligns the settings button with the tabs. The adapter restores its changes when the plugin stops.
+
 ## Install
 
 In WNotch Settings, under **Plugins**, enter `Brick-Bread/wnotch-glass` and press **Install**, then save. Select **Glass / Smoked** or **Glass / Frosted** under **Plugin theme** and save again. Requires WNotch with plugin API 6 or newer.
 
-Alternatively, download `notch-glass-0.1.0.zip` from [Releases](https://github.com/Brick-Bread/wnotch-glass/releases), extract it into `%AppData%\Notch\plugins\brick-bread.glass`, then enable **Notch Glass** in Settings.
+Alternatively, download `notch-glass-0.1.1.zip` from [Releases](https://github.com/Brick-Bread/wnotch-glass/releases), extract it into `%AppData%\Notch\plugins\brick-bread.glass`, then enable **Notch Glass** in Settings.
 
 ## Previews
 
@@ -36,7 +38,7 @@ For a different installation or source build:
 .\build.ps1 -NotchCorePath 'C:\path\to\Notch.Core.dll'
 ```
 
-This creates `dist\brick-bread.glass` and `dist\notch-glass-0.1.0.zip`. The plugin does not ship `Notch.Core.dll`, use NuGet packages, poll, access the network or alter saved application settings. Its entry point only registers themes.
+This creates `dist\brick-bread.glass` and `dist\notch-glass-0.1.1.zip`. The plugin does not ship `Notch.Core.dll`, use NuGet packages, access the network or alter saved application settings. Its entry point registers themes and starts the top-bar adapter on Notch's UI dispatcher. The adapter reacts to layout changes; it retries window discovery once a second only until the notch's tab strip is available.
 
 ## Try in Notch
 
@@ -56,11 +58,12 @@ To install permanently, copy `dist\brick-bread.glass` into `%AppData%\Notch\plug
 dotnet run --project tools\ThemeCheck -- dist\brick-bread.glass artifacts
 ```
 
-The native WPF checker loads the shipped dictionaries, checks supported resource types and opaque terminal colours, measures text contrast over black and white desktops, and renders `artifacts\smoked.png` and `artifacts\frosted.png`. It exercises real control templates in a sample layout; it is not an end-to-end test of the running Notch. It also checks theme registration through the installed plugin interface and verifies that the package excludes the host DLL.
+The native WPF checker loads the shipped dictionaries, checks supported resource types and opaque terminal colours, measures text contrast over black and white desktops, and renders `artifacts\smoked.png` and `artifacts\frosted.png`. It reproduces stale plugin-tab styles and checks existing and newly added tabs, theme changes, selection, bar width, tab removal and cleanup. It exercises real control templates in a sample layout; it is not an end-to-end test of the running Notch. It also checks theme registration through the installed plugin interface and verifies that the package excludes the host DLL.
 
 ## Theme Files
 
 - `GlassThemePlugin.cs`: registers both themes with the host.
+- `TopBarThemeBinding.cs`: keeps plugin-managed tabs and the settings button consistent with the theme.
 - `plugin.json`: the real Notch plugin manifest.
 - `themes/smoked.xaml` and `themes/frosted.xaml`: surface and terminal palettes.
 - `themes/controls.xaml`: shared fonts, radii and seven supported control styles.
@@ -75,7 +78,7 @@ API reference: [WNotch plugin guide](https://github.com/Brick-Bread/WNotch/blob/
 
 ## Releases
 
-GitHub Actions builds and validates the plugin on pushes to `main` and pull requests. Pushing a matching version tag, such as `v0.1.0`, creates a release with exactly one plugin ZIP, which WNotch's installer expects. The workflow pins the WNotch source used for its API reference; local builds use the installed host DLL by default.
+GitHub Actions builds and validates the plugin on pushes to `main` and pull requests. Pushing a matching version tag, such as `v0.1.1`, creates a release with exactly one plugin ZIP, which WNotch's installer expects. The workflow pins the WNotch source used for its API reference; local builds use the installed host DLL by default.
 
 ## License
 

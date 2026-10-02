@@ -1,10 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableDefaultPageItems>false</EnableDefaultPageItems>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <EnableDynamicLoading>true</EnableDynamicLoading>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <NotchCorePath Condition="'$(NotchCorePath)' == ''">$(LocalAppData)\Programs\Notch\Notch.Core.dll</NotchCorePath>
   </PropertyGroup>
   <ItemGroup>
@@ -13,6 +15,7 @@
       <Private>false</Private>
     </Reference>
     <Compile Remove="tools\**\*.cs;.notch-reference\**\*.cs;.notch-core\**\*.cs" />
+    <InternalsVisibleTo Include="ThemeCheck" />
     <None Update="plugin.json;themes\*.xaml" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
   </ItemGroup>
   <Target Name="CheckNotchReference" BeforeTargets="ResolveReferences">

@@ -1,9 +1,12 @@
+using System.Windows;
 using Notch.Core.Plugins;
 
 namespace Notch.Glass;
 
 public sealed class GlassThemePlugin : INotchPlugin
 {
+    private TopBarThemeBinding? _topBar;
+
     public void Start(IPluginHost host)
     {
         host.Themes.Set(new PluginTheme
@@ -23,8 +26,18 @@ public sealed class GlassThemePlugin : INotchPlugin
             File = "themes/frosted.xaml",
             Base = PluginThemeBase.Light,
         });
+
+        if (Application.Current is { } app)
+        {
+            _topBar = new TopBarThemeBinding(app, host.Log);
+            _topBar.Start();
+        }
     }
 
-    // The host removes registered themes when this plugin stops.
-    public void Stop() { }
+    public void Stop()
+    {
+        _topBar?.Dispose();
+        _topBar = null;
+        // The host removes registered themes after this call.
+    }
 }

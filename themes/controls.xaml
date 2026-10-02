@@ -10,6 +10,8 @@
     <CornerRadius x:Key="SmallRadius">5</CornerRadius>
     <CornerRadius x:Key="IconButtonRadius">8</CornerRadius>
     <sys:Double x:Key="IslandRadiusScale">1</sys:Double>
+    <sys:Double x:Key="GlassTopBarHeight">28</sys:Double>
+    <sys:Double x:Key="GlassTopBarIconWidth">32</sys:Double>
 
     <Style x:Key="GlassButtonBase" TargetType="Button">
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
@@ -116,8 +118,11 @@
         </Style.Triggers>
     </Style>
     <Style x:Key="TabButton" TargetType="RadioButton">
+        <Setter Property="FontFamily" Value="{DynamicResource UiFontFamily}" />
         <Setter Property="Foreground" Value="{DynamicResource GlassMutedBrush}" />
         <Setter Property="FontSize" Value="12" />
+        <Setter Property="MinHeight" Value="{DynamicResource GlassTopBarHeight}" />
+        <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Margin" Value="0,0,5,0" />
         <Setter Property="Padding" Value="9,5" />
         <Setter Property="Focusable" Value="False" />

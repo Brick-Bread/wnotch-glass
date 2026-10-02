@@ -8,6 +8,7 @@ using System.Windows.Documents;
 using System.Windows.Markup;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Threading;
 using Notch.Core.Plugins;
 using Notch.Glass;
 
@@ -33,7 +34,7 @@ internal static class Program
             var plugin = new GlassThemePlugin();
             plugin.Start(host);
             Require(collector.Themes.Count == 2, "Expected both theme variants.");
-            _app = new Application();
+            _app = new Application { ShutdownMode = ShutdownMode.OnExplicitShutdown };
 
             foreach (PluginTheme theme in collector.Themes)
             {
@@ -44,8 +45,9 @@ internal static class Program
                 _app.Resources.MergedDictionaries.Add(dictionary);
                 ValidateTypes();
                 ValidateContrast();
+                ValidateTopBarBindings();
                 Render(theme.Id, output);
-                Console.WriteLine($"PASS {theme.Id}: XAML, resource types, contrast and native rendering.");
+                Console.WriteLine($"PASS {theme.Id}: XAML, resource types, contrast, plugin tab bindings and native rendering.");
             }
 
             plugin.Stop();
@@ -57,6 +59,74 @@ internal static class Program
             Console.Error.WriteLine(error);
             return 1;
         }
+    }
+
+    private static void ValidateTopBarBindings()
+    {
+        var oldStyle = new Style(typeof(RadioButton));
+        oldStyle.Setters.Add(new Setter(Control.FontSizeProperty, 19.0));
+        oldStyle.Setters.Add(new Setter(FrameworkElement.MarginProperty, new Thickness(0, 0, 20, 0)));
+        var tabs = new StackPanel { Name = "TabStrip", Orientation = Orientation.Horizontal };
+        var builtIn = new RadioButton { Name = "TabHome", Content = "Home", IsChecked = true };
+        builtIn.SetResourceReference(FrameworkElement.StyleProperty, "TabButton");
+        var pluginTab = new RadioButton { Content = "Agent Usage", Style = oldStyle, Tag = ("agentstats.agent-usage", "usage") };
+        tabs.Children.Add(builtIn);
+        tabs.Children.Add(pluginTab);
+        var settings = new Button { Name = "OpenSettingsButton", Height = 22, Width = 26 };
+        var root = new StackPanel();
+        root.Children.Add(tabs);
+        root.Children.Add(settings);
+        var window = new Window { Content = root };
+        NameScope.SetNameScope(window, new NameScope());
+        window.RegisterName("TabStrip", tabs);
+        window.RegisterName("OpenSettingsButton", settings);
+        var binding = new TopBarThemeBinding(_app, new CheckLog());
+        try
+        {
+            Require(pluginTab.FontSize != builtIn.FontSize, "Fixture must reproduce the stale plugin style.");
+            binding.Start();
+            _app.Dispatcher.Invoke(() => { }, DispatcherPriority.ApplicationIdle);
+            Layout(root);
+            Require(ReferenceEquals(pluginTab.Style, builtIn.Style), "An existing plugin tab did not pick up the theme.");
+            Require(pluginTab.FontSize == 12 && pluginTab.Margin == builtIn.Margin, "Plugin tab typography or spacing differs.");
+            Require(settings.Height == 28 && settings.Width == 32, "Settings button does not match the bar height.");
+
+            var lateTab = new RadioButton { Content = "bricksmp", Style = oldStyle, Tag = ("brick-bread.calagopus", "server") };
+            tabs.Children.Add(lateTab);
+            Layout(root);
+            Require(ReferenceEquals(lateTab.Style, builtIn.Style), "A tab added after startup did not pick up the theme.");
+            Require(lateTab.ActualHeight == builtIn.ActualHeight, "Plugin and built-in tabs have different heights.");
+            lateTab.IsChecked = true;
+            Layout(root);
+            Require(lateTab.IsChecked == true && builtIn.IsChecked == false, "Radio-button selection was broken.");
+            Require(ReferenceEquals(lateTab.Foreground, Brush("AccentBrush")), "Selected plugin tabs do not use the accent colour.");
+
+            var replacement = new Style(typeof(RadioButton), Style("TabButton"));
+            replacement.Setters.Add(new Setter(Control.FontSizeProperty, 11.0));
+            _app.Resources["TabButton"] = replacement;
+            Layout(root);
+            Require(ReferenceEquals(pluginTab.Style, replacement) && ReferenceEquals(lateTab.Style, replacement), "Plugin tabs do not follow subsequent theme changes.");
+            tabs.Children.Remove(lateTab);
+            Layout(root);
+            Require(ReferenceEquals(lateTab.Style, oldStyle), "Removed plugin tabs retain owned bindings.");
+            settings.Height = 24;
+            binding.Dispose();
+            Require(ReferenceEquals(pluginTab.Style, oldStyle), "Stopping the theme did not restore the original style.");
+            Require(settings.Height == 24 && settings.Width == 26, "Stopping overwrote a subsequent change or failed to restore a dimension.");
+        }
+        finally
+        {
+            binding.Dispose();
+            _app.Resources.Remove("TabButton");
+            window.Close();
+        }
+    }
+
+    private static void Layout(FrameworkElement element)
+    {
+        element.Measure(new Size(600, double.PositiveInfinity));
+        element.Arrange(new Rect(element.DesiredSize));
+        element.UpdateLayout();
     }
 
     private static void ValidateTypes()
@@ -114,9 +184,16 @@ internal static class Program
 
         var body = new StackPanel { Width = 600 };
         var tabs = new StackPanel { Orientation = Orientation.Horizontal };
-        foreach (string label in new[] { "Home", "Terminal", "Stats", "Shelf", "Plugins" })
+        foreach (string label in new[] { "Home", "Terminal", "Stats", "Shelf", "Plugins", "Agent Usage", "bricksmp" })
             tabs.Children.Add(new RadioButton { Content = label, Style = Style("TabButton"), IsChecked = label == "Stats" });
-        body.Children.Add(tabs);
+        tabs.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+        Require(tabs.DesiredSize.Width <= 558, "Tabs overlap the settings button at Notch's 600-DIP content width.");
+        var header = new DockPanel();
+        var settings = new Button { Content = "\uE713", Style = Style("PillButton"), FontFamily = (FontFamily)Resource("IconFont"), Height = 28, Width = 32, Padding = new Thickness(0), Margin = new Thickness(10, 0, 0, 0), ToolTip = "Settings" };
+        DockPanel.SetDock(settings, Dock.Right);
+        header.Children.Add(settings);
+        header.Children.Add(tabs);
+        body.Children.Add(header);
         var cards = new UniformGrid { Columns = 3, Margin = new Thickness(-6, 12, -6, 0) };
         foreach (var (label, value, detail) in new[] { ("CPU", "18%", "4.2 GHz"), ("Memory", "8.4 GB", "of 32 GB"), ("GPU", "24%", "48 C"), ("Network", "12.8 MB/s", "Download"), ("Battery", "86%", "Connected"), ("Focus", "24:38", "Session 2 of 4") })
         {
@@ -178,4 +255,11 @@ public sealed class ThemeCollector : IPluginThemes
     public void Set(PluginTheme theme) => Themes.Add(theme);
     public bool Remove(string id) => Themes.RemoveAll(theme => theme.Id == id) > 0;
     public void Clear() => Themes.Clear();
+}
+
+internal sealed class CheckLog : IPluginLog
+{
+    public void Info(string message) => Console.WriteLine(message);
+    public void Warn(string message) => Console.Error.WriteLine(message);
+    public void Error(string message, Exception? exception = null) => throw new InvalidOperationException(message, exception);
 }
