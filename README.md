@@ -1,6 +1,6 @@
 # Notch Glass
 
-A theme plugin for [Brick-Bread/WNotch](https://github.com/Brick-Bread/WNotch), built against its supported **plugin API 6**. Version 0.1.1 offers two looks:
+A theme plugin for [Brick-Bread/WNotch](https://github.com/Brick-Bread/WNotch), built against its supported **plugin API 6**. Version 0.1.2 offers two looks:
 
 - **Glass / Smoked:** translucent charcoal, silver edges, mint highlights.
 - **Glass / Frosted:** translucent white, graphite text, teal highlights.
@@ -13,7 +13,7 @@ Built-in and plugin-managed tabs share the same font, spacing, height and select
 
 In WNotch Settings, under **Plugins**, enter `Brick-Bread/wnotch-glass` and press **Install**, then save. Select **Glass / Smoked** or **Glass / Frosted** under **Plugin theme** and save again. Requires WNotch with plugin API 6 or newer.
 
-Alternatively, download `notch-glass-0.1.1.zip` from [Releases](https://github.com/Brick-Bread/wnotch-glass/releases), extract it into `%AppData%\Notch\plugins\brick-bread.glass`, then enable **Notch Glass** in Settings.
+Alternatively, download `notch-glass-0.1.2.zip` from [Releases](https://github.com/Brick-Bread/wnotch-glass/releases), extract it into `%AppData%\Notch\plugins\brick-bread.glass`, then enable **Notch Glass** in Settings.
 
 ## Previews
 
@@ -38,7 +38,7 @@ For a different installation or source build:
 .\build.ps1 -NotchCorePath 'C:\path\to\Notch.Core.dll'
 ```
 
-This creates `dist\brick-bread.glass` and `dist\notch-glass-0.1.1.zip`. The plugin does not ship `Notch.Core.dll`, use NuGet packages, access the network or alter saved application settings. Its entry point registers themes and starts the top-bar adapter on Notch's UI dispatcher. The adapter reacts to layout changes; it retries window discovery once a second only until the notch's tab strip is available.
+This creates `dist\brick-bread.glass` and `dist\notch-glass-0.1.2.zip`. The plugin does not ship `Notch.Core.dll`, use NuGet packages, access the network or alter saved application settings. Its entry point registers themes and starts the top-bar adapter on Notch's UI dispatcher. The adapter reacts to layout changes; it retries window discovery once a second only until the notch's tab strip is available.
 
 ## Try in Notch
 
@@ -78,7 +78,7 @@ API reference: [WNotch plugin guide](https://github.com/Brick-Bread/WNotch/blob/
 
 ## Releases
 
-GitHub Actions builds and validates the plugin on pushes to `main` and pull requests. Pushing a matching version tag, such as `v0.1.1`, creates a release with exactly one plugin ZIP, which WNotch's installer expects. The workflow pins the WNotch source used for its API reference; local builds use the installed host DLL by default.
+GitHub Actions builds and validates the plugin on pushes to `main` and pull requests. Pushing a matching version tag, such as `v0.1.2`, creates a release with exactly one plugin ZIP, which WNotch's installer expects. The workflow pins the WNotch source used for its API reference; local builds use the installed host DLL by default.
 
 ## License
 

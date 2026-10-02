@@ -76,6 +76,7 @@ internal sealed class TopBarThemeBinding(Application app, IPluginLog log) : IDis
             {
                 Bind(settings, FrameworkElement.HeightProperty, "GlassTopBarHeight");
                 Bind(settings, FrameworkElement.WidthProperty, "GlassTopBarIconWidth");
+                Bind(settings, Control.PaddingProperty, "GlassTopBarIconPadding");
             }
         }
         finally { _refreshing = false; }

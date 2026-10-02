@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2
+
+- Remove text-button padding from the fixed-width settings button so its gear is centred and unclipped.
+- Check the actual host button style, glyph width and horizontal/vertical centring in native validation.
+- Use the runtime top-bar adapter in previews instead of overriding padding by hand.
+
 ## 0.1.1
 
 - Keep plugin-managed top-bar tabs on the same live theme style as built-in tabs.

@@ -1,4 +1,5 @@
 using System.IO;
+using System.Globalization;
 using System.Reflection;
 using System.Text.Json;
 using System.Windows;
@@ -72,7 +73,11 @@ internal static class Program
         var pluginTab = new RadioButton { Content = "Agent Usage", Style = oldStyle, Tag = ("agentstats.agent-usage", "usage") };
         tabs.Children.Add(builtIn);
         tabs.Children.Add(pluginTab);
-        var settings = new Button { Name = "OpenSettingsButton", Height = 22, Width = 26 };
+        var settings = new Button
+        {
+            Name = "OpenSettingsButton", Content = "\uE713", Style = Style("PillButton"),
+            FontFamily = (FontFamily)Resource("IconFont"), Height = 22, Width = 26,
+        };
         var root = new StackPanel();
         root.Children.Add(tabs);
         root.Children.Add(settings);
@@ -90,6 +95,7 @@ internal static class Program
             Require(ReferenceEquals(pluginTab.Style, builtIn.Style), "An existing plugin tab did not pick up the theme.");
             Require(pluginTab.FontSize == 12 && pluginTab.Margin == builtIn.Margin, "Plugin tab typography or spacing differs.");
             Require(settings.Height == 28 && settings.Width == 32, "Settings button does not match the bar height.");
+            ValidateSettingsIcon(settings);
 
             var lateTab = new RadioButton { Content = "bricksmp", Style = oldStyle, Tag = ("brick-bread.calagopus", "server") };
             tabs.Children.Add(lateTab);
@@ -113,6 +119,7 @@ internal static class Program
             binding.Dispose();
             Require(ReferenceEquals(pluginTab.Style, oldStyle), "Stopping the theme did not restore the original style.");
             Require(settings.Height == 24 && settings.Width == 26, "Stopping overwrote a subsequent change or failed to restore a dimension.");
+            Require(settings.Padding == new Thickness(10, 4, 10, 4), "Stopping did not restore the settings button's original padding.");
         }
         finally
         {
@@ -120,6 +127,30 @@ internal static class Program
             _app.Resources.Remove("TabButton");
             window.Close();
         }
+    }
+
+    private static void ValidateSettingsIcon(Button settings)
+    {
+        settings.ApplyTemplate();
+        var presenter = VisualChild<ContentPresenter>(settings) ?? throw new InvalidOperationException("Settings icon has no content presenter.");
+        var glyph = new FormattedText("\uE713", CultureInfo.InvariantCulture, FlowDirection.LeftToRight,
+            new Typeface(settings.FontFamily, settings.FontStyle, settings.FontWeight, settings.FontStretch),
+            settings.FontSize, settings.Foreground, 1);
+        Require(presenter.ActualWidth >= glyph.WidthIncludingTrailingWhitespace, "Settings icon is clipped by text-button padding.");
+        Point centre = presenter.TransformToAncestor(settings).Transform(new Point(presenter.ActualWidth / 2, presenter.ActualHeight / 2));
+        Require(Math.Abs(centre.X - settings.ActualWidth / 2) < 0.5 && Math.Abs(centre.Y - settings.ActualHeight / 2) < 0.5,
+            "Settings icon is not centred in its button.");
+    }
+
+    private static T? VisualChild<T>(DependencyObject parent) where T : DependencyObject
+    {
+        for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
+        {
+            DependencyObject child = VisualTreeHelper.GetChild(parent, i);
+            if (child is T match) return match;
+            if (VisualChild<T>(child) is { } descendant) return descendant;
+        }
+        return null;
     }
 
     private static void Layout(FrameworkElement element)
@@ -189,7 +220,9 @@ internal static class Program
         tabs.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
         Require(tabs.DesiredSize.Width <= 558, "Tabs overlap the settings button at Notch's 600-DIP content width.");
         var header = new DockPanel();
-        var settings = new Button { Content = "\uE713", Style = Style("PillButton"), FontFamily = (FontFamily)Resource("IconFont"), Height = 28, Width = 32, Padding = new Thickness(0), Margin = new Thickness(10, 0, 0, 0), ToolTip = "Settings" };
+        var settings = new Button { Content = "\uE713", Style = Style("PillButton"), FontFamily = (FontFamily)Resource("IconFont"), Margin = new Thickness(10, 0, 0, 0), ToolTip = "Settings" };
+        using var topBar = new TopBarThemeBinding(_app, new CheckLog());
+        topBar.Refresh(tabs, settings);
         DockPanel.SetDock(settings, Dock.Right);
         header.Children.Add(settings);
         header.Children.Add(tabs);
@@ -225,6 +258,7 @@ internal static class Program
         root.Measure(new Size(820, double.PositiveInfinity));
         root.Arrange(new Rect(root.DesiredSize));
         root.UpdateLayout();
+        ValidateSettingsIcon(settings);
         var bitmap = new RenderTargetBitmap(820, (int)Math.Ceiling(root.ActualHeight), 96, 96, PixelFormats.Pbgra32);
         bitmap.Render(root);
         byte[] pixels = new byte[bitmap.PixelWidth * bitmap.PixelHeight * 4];

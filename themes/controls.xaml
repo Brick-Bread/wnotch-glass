@@ -12,6 +12,7 @@
     <sys:Double x:Key="IslandRadiusScale">1</sys:Double>
     <sys:Double x:Key="GlassTopBarHeight">28</sys:Double>
     <sys:Double x:Key="GlassTopBarIconWidth">32</sys:Double>
+    <Thickness x:Key="GlassTopBarIconPadding">0</Thickness>
 
     <Style x:Key="GlassButtonBase" TargetType="Button">
         <Setter Property="Foreground" Value="{DynamicResource TextBrush}" />
