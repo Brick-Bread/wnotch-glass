@@ -1,0 +1,8 @@
+bin/
+obj/
+dist/
+tools/ThemeCheck/bin/
+tools/ThemeCheck/obj/
+artifacts/
+.notch-reference/
+.notch-core/

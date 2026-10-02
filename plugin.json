@@ -1,0 +1,10 @@
+{
+  "id": "brick-bread.glass",
+  "name": "Notch Glass",
+  "version": "0.1.0",
+  "author": "Brick_Bread",
+  "repository": "Brick-Bread/wnotch-glass",
+  "description": "Smoked and frosted glass themes for the whole notch, with translucent surfaces, fine borders and a matching terminal.",
+  "assembly": "Notch.Glass.dll",
+  "apiVersion": 6
+}

@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableDynamicLoading>true</EnableDynamicLoading>
+    <Version>0.1.0</Version>
+    <NotchCorePath Condition="'$(NotchCorePath)' == ''">$(LocalAppData)\Programs\Notch\Notch.Core.dll</NotchCorePath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Notch.Core">
+      <HintPath>$(NotchCorePath)</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Compile Remove="tools\**\*.cs;.notch-reference\**\*.cs;.notch-core\**\*.cs" />
+    <None Update="plugin.json;themes\*.xaml" CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+  <Target Name="CheckNotchReference" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(NotchCorePath)')" Text="Notch.Core.dll was not found. Build with -p:NotchCorePath=C:\path\to\Notch.Core.dll from a WNotch build with plugin API 6 or newer." />
+  </Target>
+</Project>

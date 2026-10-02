@@ -1,0 +1,52 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="controls.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!-- A dense tint preserves legibility over both bright and dark desktops. -->
+    <LinearGradientBrush x:Key="IslandBrush" StartPoint="0,0" EndPoint="0.75,1">
+        <GradientStop Color="#F03A4042" Offset="0" />
+        <GradientStop Color="#EE202526" Offset="0.32" />
+        <GradientStop Color="#F0171B1D" Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="TextBrush" Color="#F3F6F5" />
+    <SolidColorBrush x:Key="AccentBrush" Color="#A5E5CE" />
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#26A5E5CE" />
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="#40A5E5CE" />
+    <LinearGradientBrush x:Key="CardBrush" StartPoint="0,0" EndPoint="0,1">
+        <GradientStop Color="#18FFFFFF" Offset="0" />
+        <GradientStop Color="#08FFFFFF" Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="ControlBrush" Color="#14FFFFFF" />
+    <SolidColorBrush x:Key="HoverBrush" Color="#24FFFFFF" />
+    <SolidColorBrush x:Key="PressedBrush" Color="#34FFFFFF" />
+    <SolidColorBrush x:Key="TrackBrush" Color="#30FFFFFF" />
+    <LinearGradientBrush x:Key="GlassEdgeBrush" StartPoint="0,0" EndPoint="0.4,1">
+        <GradientStop Color="#44FFFFFF" Offset="0" />
+        <GradientStop Color="#18FFFFFF" Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="GlassMutedBrush" Color="#D0DBD6" />
+
+    <!-- WebView2's terminal needs opaque RGB colours, even when the shell is translucent. -->
+    <SolidColorBrush x:Key="TerminalBackgroundBrush" Color="#1B2022" />
+    <SolidColorBrush x:Key="TerminalForegroundBrush" Color="#E9F0ED" />
+    <SolidColorBrush x:Key="TerminalCursorBrush" Color="#A5E5CE" />
+    <SolidColorBrush x:Key="TerminalSelectionBrush" Color="#3C5750" />
+    <SolidColorBrush x:Key="TerminalAnsi0Brush" Color="#242A2C" />
+    <SolidColorBrush x:Key="TerminalAnsi1Brush" Color="#F29A9F" />
+    <SolidColorBrush x:Key="TerminalAnsi2Brush" Color="#A5DBAE" />
+    <SolidColorBrush x:Key="TerminalAnsi3Brush" Color="#E9D294" />
+    <SolidColorBrush x:Key="TerminalAnsi4Brush" Color="#99C4F0" />
+    <SolidColorBrush x:Key="TerminalAnsi5Brush" Color="#D8ADE7" />
+    <SolidColorBrush x:Key="TerminalAnsi6Brush" Color="#91D7D7" />
+    <SolidColorBrush x:Key="TerminalAnsi7Brush" Color="#CFD9D5" />
+    <SolidColorBrush x:Key="TerminalAnsi8Brush" Color="#9AA9A4" />
+    <SolidColorBrush x:Key="TerminalAnsi9Brush" Color="#FFB8BB" />
+    <SolidColorBrush x:Key="TerminalAnsi10Brush" Color="#C4ECC9" />
+    <SolidColorBrush x:Key="TerminalAnsi11Brush" Color="#F4E4B7" />
+    <SolidColorBrush x:Key="TerminalAnsi12Brush" Color="#B5D8FA" />
+    <SolidColorBrush x:Key="TerminalAnsi13Brush" Color="#E7C7EF" />
+    <SolidColorBrush x:Key="TerminalAnsi14Brush" Color="#B5EAE7" />
+    <SolidColorBrush x:Key="TerminalAnsi15Brush" Color="#F3F6F5" />
+</ResourceDictionary>
